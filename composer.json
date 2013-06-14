@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-0": {
+            "Buscador\\": "src/"
+        }
+    },
+    "require": {
+        "silex/silex": "~1.0"
+    }
+}
