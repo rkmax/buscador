@@ -29,7 +29,7 @@ $app->register(new Silex\Provider\SessionServiceProvider(), array(
     'cookie_path' => __DIR__ . '/../cache/session'
 ));
 
-// Capade seguridad
+// Capa de seguridad
 $app->register(new Silex\Provider\SecurityServiceProvider(), array(
     'security.firewalls' => array(
         'assets' => array(
@@ -58,6 +58,13 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), array(
     )
 ));
 
+$app['security.encoder.digest'] = $app->share(function ($app) {
+    // use the sha1 algorithm
+    // don't base64 encode the password
+    // use only 10 iteration
+    return new Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder('sha1', false, 10);
+});
+
 ////////////////////////////////////////////////////////////
 //
 //  Inicializando definiendo la DB
@@ -80,9 +87,12 @@ if (!$schema->tablesExist($tableName)) {
     $schema->createTable($usuario);
 
     // Fixture usuario de ejemplo
+    $user = new Symfony\Component\Security\Core\User\User('pollo', '123', array('ROLE_USER'));
+    $encoder = $app['security.encoder_factory']->getEncoder($user);
+    $password = $encoder->encodePassword('123', '');
     $app['db']->insert($tableName, array(
-        'username' => 'pollo',
-        'password' => '123', // la clasica,
+        'username' => $user->getUsername(),
+        'password' => $password,
         'roles' => 'ROLE_USER'
     ));
 }
