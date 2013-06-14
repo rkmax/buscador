@@ -32,18 +32,29 @@ $app->register(new Silex\Provider\SessionServiceProvider(), array(
 // Capade seguridad
 $app->register(new Silex\Provider\SecurityServiceProvider(), array(
     'security.firewalls' => array(
-        'asegurado' => array(
+        'assets' => array(
+            'pattern' =>  '^/css|images|js)/',
+            'security' => false,
+        ),
+        'buscador' => array(
+            'pattern' => '^/agenda/.*',
+            'anonymous' => true,
             'form' => array(
                 'login_path' => '/login',
                 'check_path' => '/login_check'
             ),
             'logout' => array(
-                'lgout_path' => '/logout'
-            )
+                'logout_path' => '/logout'
+            ),
+            'users' => $app->share(function () use ($app) {
+                return new Buscador\Model\ProveedorUsuarios($app['db']);
+            }),
         )
     ),
     'security.access_rules' => array(
-        array('^/.*$', 'IS_AUTHENTICATED_ANONYMOUSLY')
+        array('^/.*$', 'IS_AUTHENTICATED_ANONYMOUSLY'),
+        array('^/login', 'IS_AUTHENTICATED_ANONYMOUSLY'),
+        array('^/agenda/.*$', 'ROLE_USER')
     )
 ));
 
@@ -53,6 +64,28 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), array(
 //
 ////////////////////////////////////////////////////////////
 
+$schema = $app['db']->getSchemaManager();
+
+// Usuario
+$tableName = "usuario";
+if (!$schema->tablesExist($tableName)) {
+    $usuario = new Doctrine\DBAL\Schema\Table($tableName);
+    $usuario->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => true));
+    $usuario->setPrimaryKey(array('id'));
+    $usuario->addColumn('username', 'string', array('length' => 32));
+    $usuario->addUniqueIndex(array('username'));
+    $usuario->addColumn('password', 'string', array('length' => 255));
+    $usuario->addColumn('roles', 'string', array('length' => 255));
+
+    $schema->createTable($usuario);
+
+    // Fixture usuario de ejemplo
+    $app['db']->insert($tableName, array(
+        'username' => 'pollo',
+        'password' => '123', // la clasica,
+        'roles' => 'ROLE_USER'
+    ));
+}
 
 ////////////////////////////////////////////////////////////
 //

@@ -1,7 +1,7 @@
 {
     "autoload": {
         "psr-0": {
-            "Buscador\\": "src/"
+            "Buscador": "src/"
         }
     },
     "require": {
