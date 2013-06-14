@@ -11,7 +11,7 @@ $sesion->get('/logout', function() {
     return $id;
 });
 
-$sesion->post('/login_check', function() use ($sesion) {
+$sesion->post('/login_check', function() use ($app) {
     return 'ok';
 });
 
