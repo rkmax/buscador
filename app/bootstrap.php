@@ -32,12 +32,7 @@ $app->register(new Silex\Provider\SessionServiceProvider(), array(
 // Capade seguridad
 $app->register(new Silex\Provider\SecurityServiceProvider(), array(
     'security.firewalls' => array(
-        'buscador' => array(
-            'pattern' => '^/.*',
-            'anonymous' => true
-        ),
         'asegurado' => array(
-            'pattern' => '^/agenda/.*',
             'form' => array(
                 'login_path' => '/login',
                 'check_path' => '/login_check'
@@ -46,8 +41,18 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), array(
                 'lgout_path' => '/logout'
             )
         )
+    ),
+    'security.access_rules' => array(
+        array('^/.*$', 'IS_AUTHENTICATED_ANONYMOUSLY')
     )
 ));
+
+////////////////////////////////////////////////////////////
+//
+//  Inicializando definiendo la DB
+//
+////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////
 //
