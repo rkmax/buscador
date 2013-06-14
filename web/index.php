@@ -4,4 +4,8 @@
 
     $app['debug'] = true;
 
+    if($app['debug']) {
+        $app->register(new Whoops\Provider\Silex\WhoopsServiceProvider());
+    }
+
     $app->run();
